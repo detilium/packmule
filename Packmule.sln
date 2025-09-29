@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{66332507-38A2-4763-BD4A-FE46CAAF1BC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packmule.Api", "src\Packmule.Api\Packmule.Api.csproj", "{FF2A8746-3521-47E5-AF23-CD605C5C3CBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packmule.Core", "src\Packmule.Core\Packmule.Core.csproj", "{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{2C87768A-6A55-49CB-AEE4-46A042AE49E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Packmule.Infrastructure.PostgreSQL", "src\Infrastructure\Packmule.Infrastructure.PostgreSQL\Packmule.Infrastructure.PostgreSQL.csproj", "{B82AB31C-D816-40C1-A18D-8330D7489876}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF2A8746-3521-47E5-AF23-CD605C5C3CBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2A8746-3521-47E5-AF23-CD605C5C3CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2A8746-3521-47E5-AF23-CD605C5C3CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2A8746-3521-47E5-AF23-CD605C5C3CBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B82AB31C-D816-40C1-A18D-8330D7489876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B82AB31C-D816-40C1-A18D-8330D7489876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B82AB31C-D816-40C1-A18D-8330D7489876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B82AB31C-D816-40C1-A18D-8330D7489876}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FF2A8746-3521-47E5-AF23-CD605C5C3CBC} = {66332507-38A2-4763-BD4A-FE46CAAF1BC4}
+		{B81D1E0E-3A81-4AF6-9B9B-784FB04E12D2} = {66332507-38A2-4763-BD4A-FE46CAAF1BC4}
+		{2C87768A-6A55-49CB-AEE4-46A042AE49E3} = {66332507-38A2-4763-BD4A-FE46CAAF1BC4}
+		{B82AB31C-D816-40C1-A18D-8330D7489876} = {2C87768A-6A55-49CB-AEE4-46A042AE49E3}
+	EndGlobalSection
+EndGlobal
