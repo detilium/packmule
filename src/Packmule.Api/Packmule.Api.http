@@ -1,6 +1,0 @@
-@Packmule.Api_HostAddress = http://localhost:5182
-
-GET {{Packmule.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

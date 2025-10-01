@@ -1,9 +1,15 @@
+using Packmule.Api.Documents;
+using Packmule.Core.Interfaces;
+using Packmule.Infrastructure.PostgreSQL.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddPostgreSQL(builder.Configuration.GetConnectionString("DatabaseContext"));
 
 var app = builder.Build();
 
@@ -16,29 +22,46 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/{packageName}", async (string packageName, IUnitOfWork unitOfWork, CancellationToken cancellationToken) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var package = await unitOfWork.PackageRepository.GetPackageAsync(packageName, cancellationToken);
+    if (package is null)
+        return Results.NotFound(new { error = "Package not found." });
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var tags = package.DistTags.ToDictionary(d => d.Tag, d => d.Version, StringComparer.Ordinal);
+    var versions = package.Versions.ToDictionary(
+        v => v.Version,
+        v => new PackageVersionDocument(
+            v.Version,
+            v.Manifest,
+            v.TarballUri,
+            v.Integrity,
+            v.Deprecation,
+            v.CreatedAt
+        ),
+        StringComparer.Ordinal);
+
+    var time = new Dictionary<string, DateTimeOffset>(StringComparer.Ordinal)
+    {
+        ["created"] = package.CreatedAt,
+        ["modified"] = package.ModifiedAt
+    };
+
+    foreach (var v in package.Versions)
+        time[v.Version] = v.CreatedAt;
+
+    var document = new PackageDocument(
+        package.Name,
+        tags,
+        versions,
+        time,
+        package.CreatedAt,
+        package.ModifiedAt
+    );
+
+    return Results.Ok(document);
 })
-.WithName("GetWeatherForecast")
+.WithName("GetPackage")
 .WithOpenApi();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

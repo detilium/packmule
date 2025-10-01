@@ -6,4 +6,7 @@ public class Package
 	public required string Name { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public DateTime ModifiedAt { get; set; }
+
+	public IReadOnlyList<PackageVersion> Versions { get; set; }
+	public IReadOnlyList<DistTag> DistTags { get; set; }
 }
