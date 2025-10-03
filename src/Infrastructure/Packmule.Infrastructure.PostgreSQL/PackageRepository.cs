@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using Packmule.Core.Exceptions;
 using Packmule.Core.Interfaces;
@@ -15,7 +16,7 @@ public class PackageRepository : IPackageRepository
 		this.context = context;
 	}
 
-	public async Task<Guid> CreatePackageAsync(string packageName, CancellationToken cancellationToken = default)
+	public async Task<Package> CreatePackageAsync(string packageName, CancellationToken cancellationToken = default)
 	{
 		var package = new PackageEntity()
 		{
@@ -25,10 +26,19 @@ public class PackageRepository : IPackageRepository
 		};
 
 		await context.Packages.AddAsync(package);
-		return package.Id;
+
+		var result = new Package()
+		{
+			Id = package.Id,
+			Name = package.Name,
+			CreatedAt = package.CreatedAt,
+			ModifiedAt = package.ModifiedAt
+		};
+
+		return result;
 	}
 
-	public async Task<Guid> CreatePackageVersionAsync(Guid packageId, string version, string manifestJson, string tarballUrl, string integrity, CancellationToken cancellationToken = default)
+	public async Task<PackageVersion> CreatePackageVersionAsync(Guid packageId, string version, string manifestJson, string tarballUrl, string integrity, CancellationToken cancellationToken = default)
 	{
 		var packageVersion = new PackageVersionEntity()
 		{
@@ -41,7 +51,19 @@ public class PackageRepository : IPackageRepository
 		};
 
 		await context.PackageVersions.AddAsync(packageVersion);
-		return packageVersion.Id;
+
+		var result = new PackageVersion()
+		{
+			Id = packageVersion.Id,
+			Version = packageVersion.Version,
+			Manifest = packageVersion.Manifest,
+			TarballUri = packageVersion.TarballUri,
+			Integrity = packageVersion.Integrity,
+			CreatedAt = packageVersion.CreatedAt,
+			PackageId = packageVersion.PackageId
+		};
+
+		return result;
 	}
 
 	public async Task DeprecatePackageVersionAsync(Guid packageVersionId, string? deprecation, CancellationToken cancellationToken = default)
@@ -235,17 +257,9 @@ public class PackageRepository : IPackageRepository
 		context.DistTags.Remove(entity);
 	}
 
-	public async Task UpsertDistTagAsync(Guid packageId, string tag, string version, CancellationToken cancellationToken = default)
+	public async Task<DistTag> UpsertDistTagAsync(Guid packageId, string tag, string version, CancellationToken cancellationToken = default)
 	{
 		tag = tag.Trim();
-
-		var hasVersion = await context.PackageVersions
-			.AnyAsync(x => x.PackageId == packageId && x.Version == version, cancellationToken);
-
-		if (!hasVersion)
-		{
-			throw new InvalidOperationException("Version not found for package.");
-		}
 
 		var existingTag = await context.DistTags
 			.SingleOrDefaultAsync(x => x.PackageId == packageId && x.Tag == tag);
@@ -259,12 +273,18 @@ public class PackageRepository : IPackageRepository
 				Version = version
 			};
 			await context.DistTags.AddAsync(newTag);
-			return;
+		}
+		else if (!version.Equals(existingTag.Version, StringComparison.InvariantCultureIgnoreCase))
+		{
+			existingTag.Version = version;
 		}
 
-		if (version.Equals(existingTag.Version, StringComparison.InvariantCultureIgnoreCase))
-			return;
+		var result = new DistTag()
+		{
+			Tag = tag,
+			Version = version
+		};
 
-		existingTag.Version = version;
+		return result;
 	}
 }
