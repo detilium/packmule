@@ -83,14 +83,7 @@ app.MapGet("/{packageName}", async (string packageName, IUnitOfWork unitOfWork, 
     var tags = package.DistTags.ToDictionary(d => d.Tag, d => d.Version, StringComparer.Ordinal);
     var versions = package.Versions.ToDictionary(
         v => v.Version,
-        v => new PackageVersionDocument(
-            v.Version,
-            v.Manifest,
-            v.TarballUri,
-            v.Integrity,
-            v.Deprecation,
-            v.CreatedAt
-        ),
+        v => JsonDocument.Parse(v.Manifest),
         StringComparer.Ordinal);
 
     var time = new Dictionary<string, DateTimeOffset>(StringComparer.Ordinal)
@@ -102,14 +95,16 @@ app.MapGet("/{packageName}", async (string packageName, IUnitOfWork unitOfWork, 
     foreach (var v in package.Versions)
         time[v.Version] = v.CreatedAt;
 
-    var document = new PackageDocument(
-        package.Name,
-        tags,
-        versions,
-        time,
-        package.CreatedAt,
-        package.ModifiedAt
-    );
+    var document = new PackageDocument()
+    {
+        Id = package.Name,
+        Name = package.Name,
+        DistTags = tags,
+        Versions = versions,
+        Time = time
+    };
+
+    var tmp = JsonSerializer.Serialize(document, options: new(JsonSerializerDefaults.Web));
 
     return Results.Ok(document);
 })
@@ -183,7 +178,7 @@ app.MapPut("/{pkg}", async (string pkg, PublishRequest request, IHostEnvironment
     version.Value.Dist.Integrity = integrity;
     version.Value.Dist.Tarball = tarballUrl;
 
-    var versionManifest = JsonSerializer.Serialize(version, options: new(JsonSerializerDefaults.Web));
+    var versionManifest = JsonSerializer.Serialize(version.Value, options: new(JsonSerializerDefaults.Web));
 
     var packageVersion = await unitOfWork.PackageRepository.CreatePackageVersionAsync(
         package.Id,
